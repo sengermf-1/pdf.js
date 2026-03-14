@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/* Modified from the original Mozilla PDF.js source on 2026-03-14.
+ * Added compliance notice documents to the generic and dist build outputs.
+ */
+
 import {
   babelPluginPDFJSPreprocessor,
   babelPluginStripSrcPath,
@@ -1073,6 +1077,9 @@ function buildGeneric(defines, dir) {
       .src(COMMON_WEB_FILES, { base: "web/", encoding: false })
       .pipe(gulp.dest(dir + "web")),
     gulp.src("LICENSE", { encoding: false }).pipe(gulp.dest(dir)),
+    gulp
+      .src(["MODIFICATIONS.md", "THIRD_PARTY_NOTICES.md"], { encoding: false })
+      .pipe(gulp.dest(dir)),
     gulp
       .src(["web/locale/*/viewer.ftl", "web/locale/locale.json"], {
         base: "web/",
@@ -2582,6 +2589,11 @@ gulp.task(
           .pipe(gulp.dest(DIST_DIR)),
         gulp
           .src(GENERIC_DIR + "LICENSE", { encoding: false })
+          .pipe(gulp.dest(DIST_DIR)),
+        gulp
+          .src(["MODIFICATIONS.md", "THIRD_PARTY_NOTICES.md"], {
+            encoding: false,
+          })
           .pipe(gulp.dest(DIST_DIR)),
         gulp
           .src(GENERIC_DIR + "web/cmaps/**/*", {

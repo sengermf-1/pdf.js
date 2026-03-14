@@ -19,6 +19,9 @@ Adobe CMap resources are covered by their own copyright but the same license:
     Copyright 1990-2015 Adobe Systems Incorporated.
 
 See https://github.com/adobe-type-tools/cmap-resources
+
+Modified from the original Mozilla PDF.js source on 2026-03-14.
+Added sidebar entries and containers for the custom layers and annotations panels.
 -->
 <html dir="ltr" mozdisallowselectionprint>
   <head>
@@ -162,6 +165,11 @@ See https://github.com/adobe-type-tools/cmap-resources
                               <span data-l10n-id="pdfjs-views-manager-layers-option-label"></span>
                             </button>
                           </li>
+                          <li>
+                            <button id="annotationsViewMenu" role="option" type="button" tabindex="-1">
+                              <span>Annotations</span>
+                            </button>
+                          </li>
                         </menu>
                       </div>
                       <span id="viewsManagerHeaderLabel" class="viewsManagerLabel" role="heading" aria-level="2"></span>
@@ -288,6 +296,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                     <div id="outlinesView" class="treeView hidden"></div>
                     <div id="attachmentsView" class="hidden"></div>
                     <div id="layersView" class="treeView hidden"></div>
+                    <div id="annotationsView" class="treeView hidden"></div>
                   </div>
                   <div
                     id="viewsManagerResizer"

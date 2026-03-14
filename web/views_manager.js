@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/* Modified from the original Mozilla PDF.js source on 2026-03-14.
+ * Extended sidebar view switching to handle custom layers and annotations states.
+ */
+
 /** @typedef {import("./event_utils.js").EventBus} EventBus */
 
 import {
@@ -54,6 +58,8 @@ const UI_NOTIFICATION_CLASS = "pdfSidebarNotification";
  *   the attachments view.
  * @property {HTMLButtonElement} layersButton - The button used to show
  *   the layers view.
+ * @property {HTMLButtonElement} annotationsButton - The button used to show
+ *   the annotations view.
  * @property {HTMLDivElement} thumbnailView - The container in which
  *   the thumbnails are placed.
  * @property {HTMLDivElement} outlineView - The container in which
@@ -62,6 +68,8 @@ const UI_NOTIFICATION_CLASS = "pdfSidebarNotification";
  *   the attachments are placed.
  * @property {HTMLDivElement} layersView - The container in which
  *   the layers are placed.
+ * @property {HTMLDivElement} annotationsView - The container in which
+ *   the annotations are placed.
  * @property {HTMLButtonElement} currentOutlineItemButton - The button used to
  *   find the current outline item.
  */
@@ -85,10 +93,12 @@ class ViewsManager extends Sidebar {
       outlineButton,
       attachmentsButton,
       layersButton,
+      annotationsButton,
       thumbnailsView,
       outlinesView,
       attachmentsView,
       layersView,
+      annotationsView,
       viewsManagerAddFileButton,
       viewsManagerCurrentOutlineButton,
       viewsManagerSelectorButton,
@@ -132,14 +142,17 @@ class ViewsManager extends Sidebar {
     this.outlineButton = outlineButton;
     this.attachmentsButton = attachmentsButton;
     this.layersButton = layersButton;
+    this.annotationsButton = annotationsButton;
 
     this.thumbnailsView = thumbnailsView;
     this.outlinesView = outlinesView;
     this.attachmentsView = attachmentsView;
     this.layersView = layersView;
+    this.annotationsView = annotationsView;
 
     this.viewsManagerAddFileButton = viewsManagerAddFileButton;
     this.viewsManagerCurrentOutlineButton = viewsManagerCurrentOutlineButton;
+    this.viewsManagerSelectorButton = viewsManagerSelectorButton;
     this.viewsManagerHeaderLabel = viewsManagerHeaderLabel;
     this.viewsManagerStatus = viewsManagerStatus;
 
@@ -153,7 +166,13 @@ class ViewsManager extends Sidebar {
     this.menu = new Menu(
       viewsManagerSelectorOptions,
       viewsManagerSelectorButton,
-      [thumbnailButton, outlineButton, attachmentsButton, layersButton]
+      [
+        thumbnailButton,
+        outlineButton,
+        attachmentsButton,
+        layersButton,
+        annotationsButton,
+      ]
     );
 
     ViewsManager.#l10nDescription ||= Object.freeze({
@@ -178,6 +197,7 @@ class ViewsManager extends Sidebar {
     this.outlineButton.disabled =
       this.attachmentsButton.disabled =
       this.layersButton.disabled =
+      this.annotationsButton.disabled =
         false;
     this.viewsManagerCurrentOutlineButton.disabled = true;
   }
@@ -224,6 +244,7 @@ class ViewsManager extends Sidebar {
     const isViewChanged = view !== this.active;
     let forceRendering = false;
     let titleL10nId = null;
+    let selectorIcon = "thumbs";
 
     switch (view) {
       case SidebarView.NONE:
@@ -233,25 +254,35 @@ class ViewsManager extends Sidebar {
         return; // Closing will trigger rendering and dispatch the event.
       case SidebarView.THUMBS:
         titleL10nId = "pagesTitle";
+        selectorIcon = "thumbs";
         if (this.isOpen && isViewChanged) {
           forceRendering = true;
         }
         break;
       case SidebarView.OUTLINE:
         titleL10nId = "outlinesTitle";
+        selectorIcon = "outline";
         if (this.outlineButton.disabled) {
           return;
         }
         break;
       case SidebarView.ATTACHMENTS:
         titleL10nId = "attachmentsTitle";
+        selectorIcon = "attachments";
         if (this.attachmentsButton.disabled) {
           return;
         }
         break;
       case SidebarView.LAYERS:
         titleL10nId = "layersTitle";
+        selectorIcon = "layers";
         if (this.layersButton.disabled) {
+          return;
+        }
+        break;
+      case SidebarView.ANNOTATIONS:
+        selectorIcon = "annotations";
+        if (this.annotationsButton.disabled) {
           return;
         }
         break;
@@ -265,10 +296,17 @@ class ViewsManager extends Sidebar {
     }
     this.viewsManagerAddFileButton.hidden = view !== SidebarView.THUMBS;
     this.viewsManagerCurrentOutlineButton.hidden = view !== SidebarView.OUTLINE;
-    this.viewsManagerHeaderLabel.setAttribute(
-      "data-l10n-id",
-      ViewsManager.#l10nDescription[titleL10nId] || ""
-    );
+    if (view === SidebarView.ANNOTATIONS) {
+      this.viewsManagerHeaderLabel.removeAttribute("data-l10n-id");
+      this.viewsManagerHeaderLabel.textContent = "Annotations";
+    } else {
+      this.viewsManagerHeaderLabel.setAttribute(
+        "data-l10n-id",
+        ViewsManager.#l10nDescription[titleL10nId] || ""
+      );
+      this.viewsManagerHeaderLabel.textContent = "";
+    }
+    this.viewsManagerSelectorButton.dataset.activeView = selectorIcon;
 
     // Update the active view *after* it has been validated above,
     // in order to prevent setting it to an invalid state.
@@ -294,6 +332,11 @@ class ViewsManager extends Sidebar {
       this.layersButton,
       view === SidebarView.LAYERS,
       this.layersView
+    );
+    toggleSelectedBtn(
+      this.annotationsButton,
+      view === SidebarView.ANNOTATIONS,
+      this.annotationsView
     );
 
     if (forceOpen && !this.isOpen) {
@@ -447,6 +490,10 @@ class ViewsManager extends Sidebar {
       eventBus.dispatch("resetlayers", { source: this });
     });
 
+    this.annotationsButton.addEventListener("click", () => {
+      this.switchView(SidebarView.ANNOTATIONS);
+    });
+
     // Buttons for view-specific options.
     this.viewsManagerCurrentOutlineButton.addEventListener("click", () => {
       eventBus.dispatch("currentoutlineitem", { source: this });
@@ -486,6 +533,14 @@ class ViewsManager extends Sidebar {
 
     eventBus._on("layersloaded", evt => {
       onTreeLoaded(evt.layersCount, this.layersButton, SidebarView.LAYERS);
+    });
+
+    eventBus._on("annotationsloaded", evt => {
+      onTreeLoaded(
+        evt.annotationsCount,
+        this.annotationsButton,
+        SidebarView.ANNOTATIONS
+      );
     });
 
     // Update the thumbnailViewer, if visible, when exiting presentation mode.

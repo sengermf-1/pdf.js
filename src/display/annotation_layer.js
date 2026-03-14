@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/* Modified from the original Mozilla PDF.js source on 2026-03-14.
+ * Added annotation lookup support so sidebar comment edits can update page annotations.
+ */
+
 /** @typedef {import("./api").PDFPageProxy} PDFPageProxy */
 /** @typedef {import("./display_utils").PageViewport} PageViewport */
 // eslint-disable-next-line max-len
@@ -4105,6 +4109,10 @@ class AnnotationLayer {
 
   getEditableAnnotation(id) {
     return this.#editableAnnotations.get(id);
+  }
+
+  getAnnotation(id) {
+    return this.#editableAnnotations.get(id) || this.#elements.find(el => el.data.id === id) || null;
   }
 
   addFakeAnnotation(editor) {

@@ -12,6 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/* Modified from the original Mozilla PDF.js source on 2026-03-14.
+ * Adjusted annotation pointer styling for the custom annotations sidebar flow.
+ */
+
 @import url(message_bar.css);
 @import url(dialog.css);
 @import url(text_layer_builder.css);
@@ -64,6 +69,89 @@
   width: 0;
   height: 0;
   display: none;
+}
+
+#mainContainer {
+  .annotationPointerOverlay {
+    --annotation-pointer-color: light-dark(#ef4136, #ff7f73);
+    --annotation-pointer-trail: light-dark(
+      rgb(239 65 54 / 0.26),
+      rgb(255 127 115 / 0.28)
+    );
+
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 160ms ease,
+      visibility 160ms ease;
+
+    &.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    &.offscreen {
+      .annotationPointerLine {
+        stroke-dasharray: 6 5;
+      }
+    }
+  }
+
+  .annotationPointerCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .annotationPointerTrail {
+    fill: none;
+    stroke: var(--annotation-pointer-trail);
+    stroke-width: 10px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .annotationPointerLine {
+    fill: none;
+    stroke: var(--annotation-pointer-color);
+    stroke-width: 4px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 2px 6px rgb(0 0 0 / 0.16));
+  }
+
+  .annotationPointerArrowHead {
+    fill: var(--annotation-pointer-color);
+    stroke: none;
+  }
+}
+
+.annotationLayer [data-annotation-id].annotationPointerActive {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px
+    color-mix(in srgb, var(--focus-ring-color) 14%, transparent);
+  border-radius: 10px;
+  animation: annotationPointerHighlight 1.8s ease-in-out infinite;
+}
+
+@keyframes annotationPointerHighlight {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px
+      color-mix(in srgb, var(--focus-ring-color) 10%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px
+      color-mix(in srgb, var(--focus-ring-color) 18%, transparent);
+  }
 }
 
 .pdfViewer {

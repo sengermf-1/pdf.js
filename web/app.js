@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/* Modified from the original Mozilla PDF.js source on 2026-03-14.
+ * Integrated the custom annotations sidebar viewer and shared comment manager wiring.
+ */
+
 // eslint-disable-next-line max-len
 /** @typedef {import("../src/display/api.js").PDFDocumentProxy} PDFDocumentProxy */
 // eslint-disable-next-line max-len
@@ -74,6 +78,7 @@ import { DownloadManager } from "web-download_manager";
 import { EditorUndoBar } from "./editor_undo_bar.js";
 import { OverlayManager } from "./overlay_manager.js";
 import { PasswordPrompt } from "./password_prompt.js";
+import { PDFAnnotationViewer } from "./pdf_annotation_viewer.js";
 import { PDFAttachmentViewer } from "web-pdf_attachment_viewer";
 import { PDFCursorTools } from "web-pdf_cursor_tools";
 import { PDFDocumentProperties } from "web-pdf_document_properties";
@@ -141,6 +146,8 @@ const PDFViewerApplication = {
   pdfAttachmentViewer: null,
   /** @type {PDFLayerViewer} */
   pdfLayerViewer: null,
+  /** @type {PDFAnnotationViewer} */
+  pdfAnnotationViewer: null,
   /** @type {PDFCursorTools} */
   pdfCursorTools: null,
   /** @type {PDFScriptingManager} */
@@ -757,6 +764,19 @@ const PDFViewerApplication = {
         l10n,
       });
     }
+    if (appConfig.viewsManager?.annotationsView) {
+      this.pdfAnnotationViewer = new PDFAnnotationViewer({
+        container: appConfig.viewsManager.annotationsView,
+        commentManager,
+        eventBus,
+        l10n,
+        linkService,
+        pdfViewer,
+        viewerContainer: appConfig.mainContainer,
+        overlayContainer: appConfig.principalContainer,
+        globalAbortSignal: abortSignal,
+      });
+    }
 
     if (appConfig.viewsManager) {
       this.viewsManager = new ViewsManager({
@@ -1188,6 +1208,7 @@ const PDFViewerApplication = {
     this.pdfOutlineViewer?.reset();
     this.pdfAttachmentViewer?.reset();
     this.pdfLayerViewer?.reset();
+    this.pdfAnnotationViewer?.reset();
 
     this.pdfHistory?.reset();
     this.findBar?.reset();
@@ -1650,6 +1671,9 @@ const PDFViewerApplication = {
           }
           this.pdfLayerViewer.render({ optionalContentConfig, pdfDocument });
         });
+      }
+      if (this.pdfAnnotationViewer) {
+        this.pdfAnnotationViewer.render({ pdfDocument });
       }
     });
 
@@ -2562,6 +2586,9 @@ function onPageMode({ mode }) {
       break;
     case "layers": // non-standard
       view = SidebarView.LAYERS;
+      break;
+    case "annotations": // non-standard
+      view = SidebarView.ANNOTATIONS;
       break;
     case "none":
       view = SidebarView.NONE;

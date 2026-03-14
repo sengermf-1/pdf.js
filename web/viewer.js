@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/* Modified from the original Mozilla PDF.js source on 2026-03-14.
+ * Registered the custom annotations panel and comment editing dialog in the viewer config.
+ */
+
 import { ScrollMode, SpreadMode } from "./ui_utils.js";
 import { AppOptions } from "./app_options.js";
 import { LinkTarget } from "./pdf_link_service.js";
@@ -114,6 +118,7 @@ function getViewerConfiguration() {
       outlineButton: document.getElementById("outlinesViewMenu"),
       attachmentsButton: document.getElementById("attachmentsViewMenu"),
       layersButton: document.getElementById("layersViewMenu"),
+      annotationsButton: document.getElementById("annotationsViewMenu"),
       viewsManagerSelectorButton: document.getElementById(
         "viewsManagerSelectorButton"
       ),
@@ -124,6 +129,7 @@ function getViewerConfiguration() {
       outlinesView: document.getElementById("outlinesView"),
       attachmentsView: document.getElementById("attachmentsView"),
       layersView: document.getElementById("layersView"),
+      annotationsView: document.getElementById("annotationsView"),
       viewsManagerAddFileButton: document.getElementById(
         "viewsManagerAddFileButton"
       ),

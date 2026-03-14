@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/* Modified from the original Mozilla PDF.js source on 2026-03-14.
+ * Added semantic layer tree classes for the customized sidebar presentation.
+ */
+
 /** @typedef {import("./event_utils.js").EventBus} EventBus */
 // eslint-disable-next-line max-len
 /** @typedef {import("../src/optional_content_config.js").OptionalContentConfig} OptionalContentConfig */
@@ -101,15 +105,20 @@ class PDFLayerViewer extends BaseTreeViewer {
    * @private
    */
   _setNestedName(element, { name = null }) {
+    const nameElement = document.createElement("span");
+    nameElement.className = "treeItemName";
+
     if (typeof name === "string") {
-      element.textContent = this._normalizeTextContent(name);
+      nameElement.textContent = this._normalizeTextContent(name);
+      element.replaceChildren(nameElement);
       return;
     }
-    element.setAttribute("data-l10n-id", "pdfjs-additional-layers");
-    element.style.fontStyle = "italic";
+    nameElement.classList.add("treeItemName-additional");
+    nameElement.setAttribute("data-l10n-id", "pdfjs-additional-layers");
+    element.replaceChildren(nameElement);
     // Trigger translation manually, since translation is paused when
     // the final layer-tree is appended to the DOM.
-    this._l10n.translateOnce(element);
+    this._l10n.translateOnce(nameElement);
   }
 
   /**
@@ -157,9 +166,11 @@ class PDFLayerViewer extends BaseTreeViewer {
         div.className = "treeItem";
 
         const element = document.createElement("a");
+        element.className = "treeItemLabel";
         div.append(element);
 
         if (typeof groupId === "object") {
+          div.classList.add("treeItemGroup");
           hasAnyNesting = true;
           this._addToggleButton(div, groupId);
           this._setNestedName(element, groupId);
@@ -170,12 +181,18 @@ class PDFLayerViewer extends BaseTreeViewer {
 
           queue.push({ parent: itemsDiv, groups: groupId.order });
         } else {
+          div.classList.add("treeItemLeaf");
           const group = optionalContentConfig.getGroup(groupId);
           const label = document.createElement("label");
+          label.className = "treeItemControl";
           const input = document.createElement("input");
+          input.className = "treeItemCheckbox";
+          const name = document.createElement("span");
+          name.className = "treeItemName";
+          name.textContent = this._normalizeTextContent(group.name);
           label.append(
             input,
-            document.createTextNode(this._normalizeTextContent(group.name))
+            name
           );
           this._bindLink(element, { groupId, input });
           input.type = "checkbox";

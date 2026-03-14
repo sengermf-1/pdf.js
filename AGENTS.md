@@ -1,5 +1,9 @@
 ## Overview
 
+## Codex Skill
+
+Use [$pdfjs-maintainer](C:/Users/Marcos%20Senger/.codex/skills/pdfjs-maintainer/SKILL.md) for any work in this repository, especially when changes affect `web/`, `src/display/`, `gulpfile.mjs`, build packaging, headers, or third-party assets.
+
 PDF.js is a Portable Document Format (PDF) viewer built with JavaScript, HTML5 Canvas, and CSS. It's a Mozilla project that provides a general-purpose, web standards-based platform for parsing and rendering PDFs without requiring native code or plugins.
 
 ## Common Commands

@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/* Modified from the original Mozilla PDF.js source on 2026-03-14.
+ * Updated selector icons for custom layers and annotations sidebar states.
+ */
+
 #outerContainer {
   &.viewsManagerMoving {
     #viewsManager {
@@ -47,6 +51,7 @@
   --menuitem-outlinesView-icon: url(images/toolbarButton-viewOutline.svg);
   --menuitem-attachmentsView-icon: url(images/toolbarButton-viewAttachments.svg);
   --menuitem-layersView-icon: url(images/toolbarButton-viewLayers.svg);
+  --menuitem-annotationsView-icon: url(images/annotation-phosphor-note.svg);
   --manage-button-icon: url(images/toolbarButton-pageDown.svg);
   --close-button-icon: url(images/pages_closeButton.svg);
   --undo-label-icon: url(images/altText_done.svg);
@@ -295,6 +300,26 @@
             background-color: var(--button-fg);
           }
 
+          &[data-active-view="thumbs"]::before {
+            mask-image: var(--menuitem-thumbnailsView-icon);
+          }
+
+          &[data-active-view="outline"]::before {
+            mask-image: var(--menuitem-outlinesView-icon);
+          }
+
+          &[data-active-view="attachments"]::before {
+            mask-image: var(--menuitem-attachmentsView-icon);
+          }
+
+          &[data-active-view="layers"]::before {
+            mask-image: var(--menuitem-layersView-icon);
+          }
+
+          &[data-active-view="annotations"]::before {
+            mask-image: var(--menuitem-annotationsView-icon);
+          }
+
           &::after {
             content: "";
             display: inline-block;
@@ -338,6 +363,9 @@
             }
             &#layersViewMenu::before {
               mask-image: var(--menuitem-layersView-icon);
+            }
+            &#annotationsViewMenu::before {
+              mask-image: var(--menuitem-annotationsView-icon);
             }
           }
         }

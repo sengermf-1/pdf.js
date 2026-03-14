@@ -1,0 +1,7 @@
+<!-- Derived from Phosphor Icons. Licensed under the MIT License. See THIRD_PARTY_NOTICES.md. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M9.25 13.5h5.5"/>
+  <path d="M10 13.5V9.4a2 2 0 1 1 4 0v4.1"/>
+  <path d="M7 17.75h10"/>
+  <path d="M6 17.75a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 17.75V19H6v-1.25Z"/>
+</svg>

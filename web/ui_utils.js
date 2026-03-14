@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/* Modified from the original Mozilla PDF.js source on 2026-03-14.
+ * Extended sidebar view identifiers to support the custom annotations panel.
+ */
+
 import { MathClamp } from "pdfjs-lib";
 
 const DEFAULT_SCALE_VALUE = "auto";
@@ -39,6 +43,7 @@ const SidebarView = {
   OUTLINE: 2,
   ATTACHMENTS: 3,
   LAYERS: 4,
+  ANNOTATIONS: 5,
 };
 
 const TextLayerMode = {
